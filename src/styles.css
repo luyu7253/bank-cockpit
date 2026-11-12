@@ -129,7 +129,7 @@ body {
 @media (max-width: 640px) {
   body { padding: 14px 16px 24px; }
   .top { flex-direction: column; align-items: flex-start; }
-  .top h1 { font-size: 21px; }
+  .top h1 { font-size: 20px; line-height: 28px; }
   .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kpi" "trend" "live" "a" "b" "c"; }
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kpi-value { font-size: 24px; }
