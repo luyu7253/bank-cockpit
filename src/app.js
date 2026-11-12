@@ -57,7 +57,9 @@ charts.barList($('[data-branches]'), {
   items: ranked.slice(0, 6).map((b) => ({ name: b.name, label: `${b.rank}. ${b.name.replace('分行', '')}`, value: b.loans })),
   color: SERIES[2], unit: '亿元', format: formatYi,
 });
-charts.barList($('[data-revenue]'), { items: revenueMix.slice(0, 4), color: SERIES[0], unit: '亿元', format: formatYi });
+// 浮层很窄，类目名用短称，悬停提示里仍是全称
+const SHORT = { 手续费及佣金: '手续费', 利息净收入: '利息净收入' };
+charts.barList($('[data-revenue]'), { items: revenueMix.slice(0, 4).map((r) => ({ ...r, label: SHORT[r.name] ?? r.name })), color: SERIES[0], unit: '亿元', format: formatYi });
 charts.segmentBar($('[data-channels]'), { items: channels, colors: SERIES });
 $('[data-branch-count]').textContent = branches.length;
 
