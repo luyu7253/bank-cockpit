@@ -1,0 +1,35 @@
+name: AI 的 PR 测试通过后自动合并并发布
+# 只处理机器人（luyu7253）从 agent/* 分支开的 PR：「测试」通过 → 合并 → 发布 Pages。
+# 用 GITHUB_TOKEN 合并不会触发 push 事件，所以这里直接调起发布流程。
+on:
+  workflow_run:
+    workflows: ["测试"]
+    types: [completed]
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      startsWith(github.event.workflow_run.head_branch, 'agent/') &&
+      github.event.workflow_run.actor.login == 'luyu7253'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+      SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: 合并 PR
+        run: |
+          pr=$(gh pr list -R "$REPO" --head "$BRANCH" --state open --json number,headRefOid --jq '.[0]')
+          [ -n "$pr" ] || { echo "没有对应的打开中的 PR"; exit 0; }
+          num=$(echo "$pr" | jq -r .number); head=$(echo "$pr" | jq -r .headRefOid)
+          [ "$head" = "$SHA" ] || { echo "PR 有更新的提交，等它的测试跑完"; exit 0; }
+          gh pr merge "$num" -R "$REPO" --merge --match-head-commit "$SHA"
+          echo "已合并 PR #$num"
+      - name: 发布到 GitHub Pages
+        run: gh workflow run pages.yml -R "$REPO" --ref main
