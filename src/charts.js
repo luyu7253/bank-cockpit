@@ -4,7 +4,7 @@
 const NS = 'http://www.w3.org/2000/svg';
 
 /** 共享悬浮提示框。 */
-const tip = (() => {
+export const tip = (() => {
   const el = document.createElement('div');
   el.className = 'tooltip';
   el.hidden = true;
@@ -22,7 +22,7 @@ const tip = (() => {
   };
 })();
 
-function svg(tag, attrs = {}, parent) {
+export function svg(tag, attrs = {}, parent) {
   const el = document.createElementNS(NS, tag);
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   parent?.append(el);
@@ -40,14 +40,17 @@ function niceTicks(min, max, count = 4) {
   return ticks;
 }
 
+let gradId = 0;
+
 /**
- * 多序列折线图（同一单位、同一纵轴）。
+ * 多序列折线图（同一单位、同一纵轴），可选面积渐变。
  * series: [{ key, name, color }]；rows: [{ month, [key]: number }]
  */
-export function lineChart(host, { rows, series, unit, format }) {
+export function lineChart(host, { rows, series, unit, format, area = false, height = 240 }) {
   host.replaceChildren();
-  const W = 640, H = 260, m = { t: 12, r: 16, b: 28, l: 52 };
+  const W = 640, H = height, m = { t: 12, r: 16, b: 26, l: 50 };
   const root = svg('svg', { viewBox: `0 0 ${W} ${H}`, class: 'chart', role: 'img' }, host);
+  const defs = svg('defs', {}, root);
   const values = rows.flatMap((r) => series.map((s) => r[s.key]));
   const ticks = niceTicks(Math.min(...values) * 0.97, Math.max(...values) * 1.01);
   const y0 = ticks[0], y1 = ticks.at(-1);
@@ -60,18 +63,23 @@ export function lineChart(host, { rows, series, unit, format }) {
   }
   rows.forEach((r, i) => {
     if (i % 4 !== 0 && i !== rows.length - 1) return;
-    svg('text', { x: x(i), y: H - 8, class: 'tick', 'text-anchor': 'middle' }, root).textContent = r.month.slice(2).replace('-', '.');
+    svg('text', { x: x(i), y: H - 6, class: 'tick', 'text-anchor': 'middle' }, root).textContent = r.month.slice(2).replace('-', '.');
   });
 
   for (const s of series) {
     const d = rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(r[s.key]).toFixed(1)}`).join('');
-    svg('path', { d, class: 'line', style: `stroke:${s.color}` }, root);
-    // 末端直接标注
+    if (area) {
+      const id = `g${++gradId}`;
+      const g = svg('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+      svg('stop', { offset: '0%', 'stop-color': s.color, 'stop-opacity': 0.32 }, g);
+      svg('stop', { offset: '100%', 'stop-color': s.color, 'stop-opacity': 0 }, g);
+      svg('path', { d: `${d}L${x(rows.length - 1)},${H - m.b}L${x(0)},${H - m.b}Z`, fill: `url(#${id})` }, root);
+    }
+    svg('path', { d, class: 'line glow', style: `stroke:${s.color}` }, root);
     const last = rows.at(-1)[s.key];
     svg('circle', { cx: x(rows.length - 1), cy: y(last), r: 4, class: 'dot', style: `fill:${s.color}` }, root);
   }
 
-  // 十字准线 + 提示
   const cross = svg('line', { y1: m.t, y2: H - m.b, class: 'crosshair', visibility: 'hidden' }, root);
   const hit = svg('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, root);
   hit.addEventListener('pointermove', (e) => {
@@ -89,7 +97,7 @@ export function lineChart(host, { rows, series, unit, format }) {
   hit.addEventListener('pointerleave', () => { cross.setAttribute('visibility', 'hidden'); tip.hide(); });
 }
 
-/** 横向条形图（单序列，HTML 实现，标签清晰）。items: [{ name, value }] */
+/** 横向条形图（单序列，HTML 实现，标签清晰）。items: [{ name, value, label? }] */
 export function barList(host, { items, color, unit, format, max }) {
   host.replaceChildren();
   const top = max ?? Math.max(...items.map((i) => i.value));
@@ -98,11 +106,12 @@ export function barList(host, { items, color, unit, format, max }) {
     row.className = 'bar-row';
     row.innerHTML = `
       <span class="bar-label">${item.label ?? item.name}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${(item.value / top) * 100}%;background:${color}"></span></span>
+      <span class="bar-track"><span class="bar-fill" style="width:0;background:${color};box-shadow:0 0 10px ${color}"></span></span>
       <span class="bar-value">${format(item.value)}</span>`;
     row.addEventListener('pointermove', (e) => tip.show(`<b>${item.name}</b><div>${format(item.value)} ${unit}</div>`, e.clientX, e.clientY));
     row.addEventListener('pointerleave', tip.hide);
     host.append(row);
+    requestAnimationFrame(() => { row.querySelector('.bar-fill').style.width = `${(item.value / top) * 100}%`; });
   }
 }
 

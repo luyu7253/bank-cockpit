@@ -7,12 +7,17 @@
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
   <header class="top">
-    <div>
-      <h1><span data-bank></span> · 经营驾驶舱（AI 现场版）</h1>
-      <p class="sub">数据截至 <span data-asof></span> · 模拟数据，仅供演示</p>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1><span data-bank></span> · 经营驾驶舱（AI 现场版）</h1>
+        <p class="sub">数据截至 <span data-asof></span> · 模拟数据，仅供演示</p>
+      </div>
     </div>
-    <time class="clock" data-clock></time>
+    <div class="status"><span class="pulse" aria-hidden="true"></span>系统运行正常<time class="clock" data-clock></time></div>
   </header>
 
   <main class="grid">
@@ -24,25 +29,39 @@
       <div data-trend></div>
     </section>
 
-    <section class="panel">
+    <section class="panel revenue">
       <header><h2>营业收入结构</h2><span class="unit">亿元 · 年初至今</span></header>
       <div data-revenue></div>
     </section>
 
-    <section class="panel">
-      <header><h2>分行贷款余额 TOP 8</h2><span class="unit">亿元</span></header>
-      <div data-branches></div>
+    <section class="panel network-panel">
+      <header><h2>分行网络 · 实时交易流向</h2><span class="unit">节点大小 = 贷款余额</span></header>
+      <div class="net-stats">
+        <div><span>今日交易笔数</span><b data-tx-count>0</b></div>
+        <div><span>今日交易金额（亿元）</span><b data-tx-amount>0</b></div>
+        <div><span>实时 TPS</span><b data-tps>—</b></div>
+      </div>
+      <div data-network></div>
     </section>
 
-    <section class="panel">
+    <section class="panel regulatory">
+      <header><h2>监管指标</h2><span class="unit">红线为常见监管口径</span></header>
+      <div class="gauges" data-gauges></div>
+    </section>
+
+    <section class="panel live">
+      <header><h2><span class="pulse" aria-hidden="true"></span>实时交易</h2><span class="unit">大额 ≥ 1000 万元</span></header>
+      <ul class="feed" data-feed></ul>
+    </section>
+
+    <section class="panel channels">
       <header><h2>交易渠道占比</h2><span class="unit">按笔数</span></header>
       <div data-channels></div>
     </section>
 
-    <section class="panel live">
-      <header><h2><span class="pulse" aria-hidden="true"></span>实时交易</h2><span class="unit">今日累计 <b data-tx-count></b> 笔</span></header>
-      <ul class="feed" data-feed></ul>
-    </section>
+    <section class="panel slot slot-empty" data-slot="a"><div class="slot-ph"><b>A</b><p>AI 待建设区</p><small>在飞书 @DSH开发团队，说「在 A 区做……」</small></div></section>
+    <section class="panel slot slot-empty" data-slot="b"><div class="slot-ph"><b>B</b><p>AI 待建设区</p><small>在飞书 @DSH开发团队，说「在 B 区做……」</small></div></section>
+    <section class="panel slot slot-empty" data-slot="c"><div class="slot-ph"><b>C</b><p>AI 待建设区</p><small>在飞书 @DSH开发团队，说「在 C 区做……」</small></div></section>
   </main>
 
   <script type="module" src="src/app.js"></script>

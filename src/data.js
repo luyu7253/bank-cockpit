@@ -81,3 +81,27 @@ export function nextTransaction(r = Math.random) {
 function round(x) {
   return Math.round(x * 10) / 10;
 }
+
+/** 核心指标近 12 个月走势（用于指标卡里的迷你趋势线）。 */
+export const kpiTrend = {
+  deposits: monthly.slice(-12).map((m) => m.deposits),
+  loans: monthly.slice(-12).map((m) => m.loans),
+  nplRatio: [1.46, 1.45, 1.44, 1.44, 1.42, 1.41, 1.39, 1.38, 1.36, 1.34, 1.33, 1.31],
+  feeIncome: [3.1, 3.4, 3.6, 3.5, 3.9, 4.0, 4.2, 4.1, 4.4, 4.6, 4.7, 4.8],
+  newCustomers: [1210, 1330, 1290, 1420, 1510, 1480, 1600, 1650, 1720, 1690, 1810, 1880],
+  activeUsers: [402, 410, 418, 425, 431, 440, 452, 461, 470, 478, 489, 497],
+};
+
+/** 月活手机银行用户（万户）。 */
+export const activeUsers = { now: 497, lastYear: 401 };
+
+/**
+ * 监管指标：value 当前值，limit 监管红线，better 'high' 表示越高越安全，max 仪表盘满刻度。
+ * 数值为虚构，红线取常见监管口径，仅作演示。
+ */
+export const regulatory = [
+  { name: '资本充足率', value: 13.62, limit: 10.5, max: 20, unit: '%', better: 'high' },
+  { name: '拨备覆盖率', value: 218.4, limit: 150, max: 300, unit: '%', better: 'high' },
+  { name: '流动性覆盖率', value: 142.7, limit: 100, max: 200, unit: '%', better: 'high' },
+  { name: '不良贷款率', value: 1.31, limit: 5, max: 6, unit: '%', better: 'low' },
+];
