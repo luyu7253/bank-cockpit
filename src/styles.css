@@ -257,7 +257,13 @@ body { background: var(--page); color: var(--text-primary); overflow: hidden; he
 .build-zone > header h2 { margin: 0; font-size: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: .1em; white-space: nowrap; }
 .build-zone > header h2::before { content: ""; width: 3px; height: 15px; border-radius: 2px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .build-zone > header .unit b { color: var(--accent); font-size: 15px; }
-.build-grid { flex: 1; min-height: 0; display: grid; gap: 12px; }
+.build-grid { flex: 1; min-height: 0; overflow: hidden; position: relative; }
+.build-track { display: flex; height: 100%; will-change: transform; }
+.build-page { flex: 0 0 100%; height: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 0 1px; }
+.build-pad { min-width: 0; }
+[data-build-pages] { display: inline-flex; gap: 6px; margin-left: 8px; vertical-align: middle; }
+[data-build-pages] i { width: 18px; height: 4px; border-radius: 2px; background: rgba(79, 195, 255, .25); transition: background .3s, width .3s; }
+[data-build-pages] i.on { width: 30px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .build-tile {
   position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
   background: linear-gradient(180deg, rgba(17, 23, 36, 0.92), rgba(12, 16, 24, 0.92));
@@ -267,8 +273,6 @@ body { background: var(--page); color: var(--text-primary); overflow: hidden; he
 .build-tile > header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
 .build-tile > header > * { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .build-tile h2 { margin: 0; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-.build-grid[data-rows="2"] .build-tile { padding: 6px 10px; }
-.build-grid[data-rows="2"] .build-tile h2 { font-size: 12px; }
 .tile-body { position: relative; flex: 1; min-height: 0; }
 .tile-canvas { position: absolute; left: 50%; top: 50%; transform-origin: center; }
 .build-tile.grow { animation: grow 1.4s cubic-bezier(.2, .9, .2, 1); }
@@ -282,6 +286,4 @@ body { background: var(--page); color: var(--text-primary); overflow: hidden; he
 .ghost-inner b { display: block; font-size: 40px; line-height: 1; color: rgba(79, 195, 255, 0.5); animation: breathe 2.4s ease-in-out infinite; }
 .ghost-inner p { margin: 6px 0 2px; font-size: 14px; letter-spacing: .3em; color: var(--text-secondary); }
 .ghost-inner small { font-size: 12px; }
-.build-grid[data-rows="2"] .ghost-inner b { font-size: 26px; }
-.build-grid[data-rows="2"] .ghost-inner small { display: none; }
 @keyframes breathe { 50% { opacity: .35; transform: scale(.92); } }
