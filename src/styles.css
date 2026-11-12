@@ -1,0 +1,138 @@
+/* 驾驶舱固定深色。图表序列色经过色觉障碍校验（对 --surface-1），新增序列按顺序取 --series-n，不要自造颜色。 */
+:root {
+  color-scheme: dark;
+  --page: #0b1220;
+  --surface-1: #121a2b;
+  --surface-2: #18223a;
+  --border: rgba(255, 255, 255, 0.08);
+  --text-primary: #eef2f8;
+  --text-secondary: #b4bccb;
+  --text-muted: #7f8aa0;
+  --grid: #222d45;
+  --axis: #34405c;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --good: #0ca30c;
+  --bad: #e66767;
+  --accent: #4fa3ff;
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 70% -10%, #15284a 0%, var(--page) 60%) fixed;
+  color: var(--text-primary);
+  padding: 20px 24px 28px;
+}
+
+.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 16px; }
+.top h1 { margin: 0; font-size: 26px; letter-spacing: 0.04em; }
+.sub { margin: 4px 0 0; color: var(--text-muted); font-size: 13px; }
+.clock { font-variant-numeric: tabular-nums; color: var(--text-secondary); font-size: 15px; }
+
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    "kpi kpi kpi"
+    "trend trend live"
+    "a b c";
+}
+.kpis { grid-area: kpi; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+.trend { grid-area: trend; }
+.live { grid-area: live; }
+
+.panel, .kpi {
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+.panel > header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.panel h2 { margin: 0; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.unit { color: var(--text-muted); font-size: 12px; }
+.unit b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+/* 核心指标 */
+.kpi h3 { margin: 0; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.kpi-value { margin: 8px 0 6px; font-size: 30px; font-weight: 650; letter-spacing: 0.01em; }
+.kpi-value small { font-size: 13px; font-weight: 400; color: var(--text-muted); margin-left: 4px; }
+.kpi-delta { margin: 0; font-size: 13px; color: var(--text-secondary); }
+.kpi-delta.good span { color: var(--good); }
+.kpi-delta.bad span { color: var(--bad); }
+
+/* 图例 */
+.legend { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--text-secondary); }
+.legend li { display: flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.legend b { color: var(--text-primary); font-weight: 600; margin-left: 2px; font-variant-numeric: tabular-nums; }
+
+/* 折线图 */
+.chart { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; }
+.chart .tick { fill: var(--text-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .dot { stroke: var(--surface-1); stroke-width: 2; }
+.chart .crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 3; }
+
+/* 条形图 */
+.bar-row { display: grid; grid-template-columns: 7.5em 1fr 4.5em; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; cursor: default; }
+.bar-label { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { height: 10px; border-radius: 0 4px 4px 0; background: rgba(255, 255, 255, 0.04); }
+.bar-fill { display: block; height: 100%; border-radius: 0 4px 4px 0; transition: width 0.8s ease; }
+.bar-value { text-align: right; font-variant-numeric: tabular-nums; }
+.bar-row:hover .bar-label { color: var(--text-primary); }
+
+/* 分段占比 */
+.seg-bar { display: flex; gap: 2px; height: 22px; margin: 6px 0 14px; }
+.seg { border-radius: 4px; min-width: 4px; }
+.seg:hover { filter: brightness(1.15); }
+
+/* 实时交易 */
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 0 rgba(12, 163, 12, 0.6); animation: pulse 1.6s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(12, 163, 12, 0); } 100% { box-shadow: 0 0 0 0 rgba(12, 163, 12, 0); } }
+.feed { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+.feed li {
+  display: grid; grid-template-columns: 4.6em 3em 5.5em 1fr auto; gap: 8px; align-items: center;
+  padding: 7px 0; border-bottom: 1px solid var(--border); animation: slide-in 0.5s ease;
+}
+.feed time { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.feed span { color: var(--text-secondary); }
+.feed b { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.feed em { font-style: normal; font-size: 11px; padding: 1px 6px; border-radius: 4px; background: rgba(201, 133, 0, 0.18); color: #f2b544; }
+.feed li.big b { color: #f2b544; }
+@keyframes slide-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* 悬浮提示 */
+.tooltip {
+  position: fixed; left: 0; top: 0; z-index: 10; pointer-events: none;
+  background: #0d1526; border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-size: 12px; color: var(--text-secondary); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+.tooltip b { color: var(--text-primary); display: block; margin-bottom: 4px; }
+.tooltip div { display: flex; align-items: center; gap: 6px; }
+.tooltip div span { margin-left: auto; padding-left: 12px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.tooltip i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+/* 窄屏：手机扫码看 */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "kpi kpi" "trend trend" "live live" "a b" "c c"; }
+  .kpis { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+}
+@media (max-width: 640px) {
+  body { padding: 14px 16px 24px; }
+  .top { flex-direction: column; align-items: flex-start; }
+  .top h1 { font-size: 21px; }
+  .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kpi" "trend" "live" "a" "b" "c"; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-value { font-size: 24px; }
+  .feed li { grid-template-columns: 4.4em 2.6em 1fr auto; }
+  .feed li span:nth-of-type(2) { display: none; }
+}

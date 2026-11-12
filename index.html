@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>经营驾驶舱</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1><span data-bank></span> · 经营驾驶舱</h1>
+      <p class="sub">数据截至 <span data-asof></span> · 模拟数据，仅供演示</p>
+    </div>
+    <time class="clock" data-clock></time>
+  </header>
+
+  <main class="grid">
+    <section class="kpis" data-kpis aria-label="核心指标"></section>
+
+    <section class="panel trend">
+      <header><h2>存贷款余额趋势</h2><span class="unit">亿元 · 近 24 个月</span></header>
+      <ul class="legend" data-trend-legend></ul>
+      <div data-trend></div>
+    </section>
+
+    <section class="panel">
+      <header><h2>营业收入结构</h2><span class="unit">亿元 · 年初至今</span></header>
+      <div data-revenue></div>
+    </section>
+
+    <section class="panel">
+      <header><h2>分行贷款余额 TOP 8</h2><span class="unit">亿元</span></header>
+      <div data-branches></div>
+    </section>
+
+    <section class="panel">
+      <header><h2>交易渠道占比</h2><span class="unit">按笔数</span></header>
+      <div data-channels></div>
+    </section>
+
+    <section class="panel live">
+      <header><h2><span class="pulse" aria-hidden="true"></span>实时交易</h2><span class="unit">今日累计 <b data-tx-count></b> 笔</span></header>
+      <ul class="feed" data-feed></ul>
+    </section>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
