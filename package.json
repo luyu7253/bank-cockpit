@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "start": "python3 -m http.server 8765"
+    "start": "node scripts/build-panels.mjs && python3 -m http.server 8765",
+    "panels": "node scripts/build-panels.mjs"
   }
 }
