@@ -29,7 +29,11 @@ jobs:
           [ -n "$pr" ] || { echo "没有对应的打开中的 PR"; exit 0; }
           num=$(echo "$pr" | jq -r .number); head=$(echo "$pr" | jq -r .headRefOid)
           [ "$head" = "$SHA" ] || { echo "PR 有更新的提交，等它的测试跑完"; exit 0; }
-          gh pr merge "$num" -R "$REPO" --merge --match-head-commit "$SHA"
-          echo "已合并 PR #$num"
+          # 多个 PR 同时测试通过时会撞上「Base branch was modified」，稍等重试
+          for i in 1 2 3 4 5 6; do
+            if gh pr merge "$num" -R "$REPO" --merge --match-head-commit "$SHA"; then echo "已合并 PR #$num"; break; fi
+            [ "$i" = 6 ] && { echo "合并失败"; exit 1; }
+            sleep $((i * 5))
+          done
       - name: 发布到 GitHub Pages
         run: gh workflow run pages.yml -R "$REPO" --ref main
