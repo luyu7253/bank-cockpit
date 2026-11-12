@@ -51,3 +51,13 @@ export function sparkPath(values, w, h, pad = 2) {
     return `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
   }).join('');
 }
+
+/**
+ * 墨卡托投影：经纬度 → 平面坐标。以 (lon0, lat0) 为原点，k 为缩放。
+ * 返回 [x, y]，y 向北为正。
+ */
+export function mercator(lon, lat, lon0 = 104, lat0 = 35, k = 1) {
+  const rad = Math.PI / 180;
+  const my = (φ) => Math.log(Math.tan(Math.PI / 4 + (φ * rad) / 2));
+  return [(lon - lon0) * rad * k, (my(lat) - my(lat0)) * k];
+}

@@ -5,64 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>示范银行 · 经营驾驶舱（AI 现场版）</title>
   <link rel="stylesheet" href="src/styles.css">
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }
+  </script>
 </head>
 <body>
-  <div class="bg-grid" aria-hidden="true"></div>
+  <!-- 1920×1080 固定画布，按窗口等比缩放（大屏专用） -->
+  <div class="screen" id="screen">
+    <div class="bg-grid" aria-hidden="true"></div>
 
-  <header class="top">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <div>
-        <h1><span data-bank></span> · 经营驾驶舱（AI 现场版）</h1>
-        <p class="sub">数据截至 <span data-asof></span> · 模拟数据，仅供演示</p>
+    <header class="top">
+      <div class="top-side left"><span class="pulse" aria-hidden="true"></span>系统运行正常 · 数据截至 <span data-asof></span></div>
+      <div class="top-title">
+        <h1><span data-bank></span> · 经营驾驶舱</h1>
+        <p>AI 现场版 · 模拟数据，仅供演示</p>
       </div>
-    </div>
-    <div class="status"><span class="pulse" aria-hidden="true"></span>系统运行正常<time class="clock" data-clock></time></div>
-  </header>
+      <div class="top-side right"><time class="clock" data-clock></time></div>
+    </header>
 
-  <main class="grid">
-    <section class="kpis" data-kpis aria-label="核心指标"></section>
-
-    <section class="panel trend">
-      <header><h2>存贷款余额趋势</h2><span class="unit">亿元 · 近 24 个月</span></header>
-      <ul class="legend" data-trend-legend></ul>
-      <div data-trend></div>
+    <section class="col left">
+      <section class="panel kpi-panel">
+        <header><h2>核心经营指标</h2><span class="unit">年初至今 · 同比</span></header>
+        <div class="kpis" data-kpis></div>
+      </section>
+      <section class="panel trend">
+        <header><h2>存贷款余额趋势</h2><span class="unit">亿元 · 近 24 个月</span></header>
+        <ul class="legend" data-trend-legend></ul>
+        <div data-trend></div>
+      </section>
     </section>
 
-    <section class="panel revenue">
-      <header><h2>营业收入结构</h2><span class="unit">亿元 · 年初至今</span></header>
-      <div data-revenue></div>
-    </section>
-
-    <section class="panel network-panel">
-      <header><h2>分行网络 · 实时交易流向</h2><span class="unit">节点大小 = 贷款余额</span></header>
-      <div class="net-stats">
+    <section class="center">
+      <div class="map" data-map></div>
+      <div class="map-stats">
         <div><span>今日交易笔数</span><b data-tx-count>0</b></div>
         <div><span>今日交易金额（亿元）</span><b data-tx-amount>0</b></div>
         <div><span>实时 TPS</span><b data-tps>—</b></div>
+        <div><span>覆盖分行</span><b data-branch-count>0</b></div>
       </div>
-      <div data-network></div>
+      <section class="float rank">
+        <header><h2>分行贷款余额 TOP 6</h2></header>
+        <div data-branches></div>
+      </section>
+      <section class="float mix">
+        <header><h2>营业收入结构</h2></header>
+        <div data-revenue></div>
+        <header style="margin-top:10px"><h2>交易渠道占比</h2></header>
+        <div data-channels></div>
+      </section>
+      <p class="map-note">地图为示意图 · 光柱高度 = 分行贷款余额 · 飞线 = 实时交易流向总行（金色为 ≥1000 万元大额）</p>
     </section>
 
-    <section class="panel regulatory">
-      <header><h2>监管指标</h2><span class="unit">红线为常见监管口径</span></header>
-      <div class="gauges" data-gauges></div>
-    </section>
-
-    <section class="panel live">
-      <header><h2><span class="pulse" aria-hidden="true"></span>实时交易</h2><span class="unit">大额 ≥ 1000 万元</span></header>
-      <ul class="feed" data-feed></ul>
-    </section>
-
-    <section class="panel channels">
-      <header><h2>交易渠道占比</h2><span class="unit">按笔数</span></header>
-      <div data-channels></div>
+    <section class="col right">
+      <section class="panel regulatory">
+        <header><h2>监管指标</h2><span class="unit">红线为常见监管口径</span></header>
+        <div class="gauges" data-gauges></div>
+      </section>
+      <section class="panel live">
+        <header><h2><span class="pulse" aria-hidden="true"></span>实时交易</h2><span class="unit">大额 ≥ 1000 万元</span></header>
+        <ul class="feed" data-feed></ul>
+      </section>
     </section>
 
     <section class="panel slot slot-empty" data-slot="a"><div class="slot-ph"><b>A</b><p>AI 待建设区</p><small>在飞书 @DSH开发团队，说「在 A 区做……」</small></div></section>
     <section class="panel slot slot-empty" data-slot="b"><div class="slot-ph"><b>B</b><p>AI 待建设区</p><small>在飞书 @DSH开发团队，说「在 B 区做……」</small></div></section>
     <section class="panel slot slot-empty" data-slot="c"><div class="slot-ph"><b>C</b><p>AI 待建设区</p><small>在飞书 @DSH开发团队，说「在 C 区做……」</small></div></section>
-  </main>
+  </div>
 
   <script type="module" src="src/app.js"></script>
 </body>

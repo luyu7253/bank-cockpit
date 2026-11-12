@@ -49,3 +49,25 @@ test('演示数据：监管指标当前都在安全区，趋势序列 12 个月'
   assert.ok(regulatory.every((r) => regulatoryState(r) === 'safe'));
   assert.ok(Object.values(kpiTrend).every((s) => s.length === 12));
 });
+
+import { mercator } from '../src/layout.js';
+import { cityCoords, HQ, branches, finance } from '../src/data.js';
+
+test('墨卡托：原点为 0，东为正、北为正，纬度越高拉伸越大', () => {
+  const [x0, y0] = mercator(104, 35);
+  assert.ok(Math.abs(x0) < 1e-12 && Math.abs(y0) < 1e-12);
+  const [xe] = mercator(121, 35); assert.ok(xe > 0);
+  const [, yn] = mercator(104, 45); assert.ok(yn > 0);
+  const dyHigh = mercator(104, 50)[1] - mercator(104, 45)[1];
+  const dyLow = mercator(104, 25)[1] - mercator(104, 20)[1];
+  assert.ok(dyHigh > dyLow);
+});
+
+test('每个分行都有坐标，总行在上海', () => {
+  for (const b of branches) assert.ok(cityCoords[b.name.replace('分行', '')], b.name);
+  assert.deepEqual([HQ.lon, HQ.lat], cityCoords['上海']);
+});
+
+test('经营指标都有 12 个月走势', () => {
+  for (const v of Object.values(finance)) assert.equal(v.trend.length, 12);
+});
