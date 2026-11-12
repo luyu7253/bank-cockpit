@@ -116,3 +116,14 @@ setInterval(() => {
 
 // ---- AI 待建设区 ----
 loadSlots({ data, metrics, layout, charts, colors: { series: SERIES, good: css('--good'), warn: css('--warn'), bad: css('--bad'), accent: css('--accent') } });
+
+// ---- 被「…」截断的文字自动补悬停全文（包括 AI 面板里的），每 2 秒检查一次 ----
+function autoTitle() {
+  for (const el of document.querySelectorAll('#screen *')) {
+    if (el.hasAttribute('title') || el.closest('svg, .map-labels')) continue;
+    const cs = getComputedStyle(el);
+    if (cs.textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth + 1) el.title = el.textContent.trim();
+  }
+}
+// 实时流水不到 1 秒就变一次，用固定间隔检查而不是等页面安静
+setInterval(autoTitle, 2000);
