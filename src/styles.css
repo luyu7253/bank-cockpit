@@ -1,15 +1,15 @@
 /* 驾驶舱固定深色。图表序列色经过色觉障碍校验（对 --surface-1），新增序列按顺序取 --series-n，不要自造颜色。 */
 :root {
   color-scheme: dark;
-  --page: #0b1220;
-  --surface-1: #121a2b;
-  --surface-2: #18223a;
-  --border: rgba(255, 255, 255, 0.08);
-  --text-primary: #eef2f8;
-  --text-secondary: #b4bccb;
-  --text-muted: #7f8aa0;
-  --grid: #222d45;
-  --axis: #34405c;
+  --page: #000000;
+  --surface-1: #101012;
+  --surface-2: #18181b;
+  --border: rgba(255, 255, 255, 0.10);
+  --text-primary: #f4f4f5;
+  --text-secondary: #c4c4c8;
+  --text-muted: #8c8c93;
+  --grid: #26262a;
+  --axis: #3d3d44;
   --series-1: #3987e5;
   --series-2: #d95926;
   --series-3: #199e70;
@@ -25,7 +25,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(1200px 600px at 70% -10%, #15284a 0%, var(--page) 60%) fixed;
+  background: radial-gradient(1200px 600px at 70% -10%, #1a1a1d 0%, var(--page) 60%) fixed;
   color: var(--text-primary);
   padding: 20px 24px 28px;
 }
@@ -113,7 +113,7 @@ body {
 /* 悬浮提示 */
 .tooltip {
   position: fixed; left: 0; top: 0; z-index: 10; pointer-events: none;
-  background: #0d1526; border: 1px solid var(--border); border-radius: 8px;
+  background: #141417; border: 1px solid var(--border); border-radius: 8px;
   padding: 8px 10px; font-size: 12px; color: var(--text-secondary); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
 }
 .tooltip b { color: var(--text-primary); display: block; margin-bottom: 4px; }
