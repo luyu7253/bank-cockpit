@@ -25,9 +25,10 @@ test('占比合计约为 100%', () => {
   assert.deepEqual(s.map((x) => x.pct), [25, 25, 50]);
 });
 
-test('金额格式：元与万元自动切换', () => {
-  assert.equal(formatAmount(860), '860 元');
-  assert.equal(formatAmount(123_456), '12.3 万元');
+test('金额格式：统一用元、千分位、2 位小数', () => {
+  assert.equal(formatAmount(860), '860.00 元');
+  assert.equal(formatAmount(123_456.7), '123,456.70 元');
+  assert.equal(formatAmount(11_189_000), '11,189,000.00 元');
 });
 
 test('带符号文字', () => {

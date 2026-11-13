@@ -29,10 +29,9 @@ export function formatYi(v) {
   return `${v.toLocaleString('zh-CN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
 }
 
-/** 交易金额格式：元 / 万元 自动切换。 */
+/** 交易金额格式：统一用元，千分位，保留 2 位小数，例如 "11,189,000.00 元"。 */
 export function formatAmount(yuan) {
-  if (yuan >= 10_000) return `${(yuan / 10_000).toLocaleString('zh-CN', { maximumFractionDigits: 1 })} 万元`;
-  return `${yuan.toLocaleString('zh-CN')} 元`;
+  return `${yuan.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 元`;
 }
 
 /** 带符号的变化文字，例如 "+5.2%" / "−0.11 pp"。 */

@@ -74,7 +74,7 @@ const CITIES = branches.map((b) => b.name.replace('分行', ''));
 export function nextTransaction(r = Math.random) {
   const type = TX_TYPES[Math.floor(r() * TX_TYPES.length)];
   const city = CITIES[Math.floor(r() * CITIES.length)];
-  const amount = Math.round(10 ** (2 + r() * 5.4)); // 100 元 ~ 2500 万元，对数分布；约 7% 为 ≥1000 万的大额
+  const amount = Math.round(10 ** (2 + r() * 5.4) * 100) / 100; // 100 元 ~ 2500 万元，精确到分，对数分布；约 7% 为 ≥1000 万的大额
   return { type, city, amount, at: new Date() };
 }
 
