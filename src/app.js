@@ -84,18 +84,22 @@ fetch(new URL('../vendor/geo/china.json', import.meta.url))
 
 // ---- 实时交易：流水 + 地图飞线 + 今日累计 ----
 const feed = $('[data-feed]');
-const today = { count: 1_284_310, amount: 386.42 };
+const today = data.todaySoFar();
 countUp($('[data-tx-count]'), today.count, { duration: 1600 });
 countUp($('[data-tx-amount]'), today.amount, { decimals: 2, duration: 1600 });
-let recent = [];
-function pushTx() {
+let recent = []; // [时间, 这一批的笔数]，用来算实时 TPS
+// 屏上每隔 gap 秒展示一笔，它代表这段时间里成交的一批；批量笔数按平均 TPS 估，交易额按平均单笔估（展示的那笔按实际金额计）
+function pushTx(gap = 0) {
   const tx = nextTransaction();
   const prevCount = today.count, prevAmount = today.amount;
-  today.count += 1 + Math.floor(Math.random() * 40);
-  today.amount += tx.amount / 1e8;
+  const batch = gap ? Math.max(1, Math.round(data.txFlow.avgTps * gap * (0.6 + Math.random() * 0.8))) : 0;
+  if (batch) {
+    today.count += batch;
+    today.amount += ((batch - 1) * data.txFlow.avgTicket * (0.7 + Math.random() * 0.6) + tx.amount) / 1e8;
+  }
   countUp($('[data-tx-count]'), today.count, { from: prevCount, duration: 600 });
   countUp($('[data-tx-amount]'), today.amount, { from: prevAmount, decimals: 2, duration: 600 });
-  recent.push(Date.now());
+  if (batch) recent.push([Date.now(), batch]);
   const big = tx.amount >= 10_000_000;
   const li = document.createElement('li');
   li.className = big ? 'big' : '';
@@ -107,11 +111,12 @@ function pushTx() {
   map.pulse(tx.city, tx.amount);
 }
 for (let i = 0; i < 10; i++) pushTx();
-(function loop() { pushTx(); setTimeout(loop, 350 + Math.random() * 700); })();
+(function loop(gap = 0) { pushTx(gap); const next = 350 + Math.random() * 700; setTimeout(() => loop(next / 1000), next); })();
 setInterval(() => {
   const now = Date.now();
-  recent = recent.filter((t) => now - t < 5000);
-  $('[data-tps]').textContent = (recent.length * 1873 / 5 + Math.random() * 40).toFixed(0);
+  recent = recent.filter(([t]) => now - t < 5000);
+  const n = recent.reduce((s, [, b]) => s + b, 0);
+  if (n) $('[data-tps]').textContent = String(Math.round(n / 5));
 }, 1000);
 
 // ---- AI 待建设区 ----

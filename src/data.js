@@ -30,8 +30,8 @@ export const monthly = Array.from({ length: 24 }, (_, i) => {
   };
 });
 
-/** 去年同期的核心指标，用于计算同比。 */
-export const lastYear = { deposits: 3520, loans: 2700, nplRatio: 1.42, feeIncome: 41.8, newCustomers: 15600 };
+/** 去年同期的核心指标，用于计算同比。存贷款直接取上面趋势里 12 个月前的那个点，和趋势图一致。 */
+export const lastYear = { deposits: monthly.at(-13).deposits, loans: monthly.at(-13).loans, nplRatio: 1.42, feeIncome: 41.8, newCustomers: 15600 };
 
 /** 本期核心指标。 */
 export const current = {
@@ -42,9 +42,9 @@ export const current = {
   newCustomers: 18240, // 年初至今新增客户（户）
 };
 
-/** 营业收入结构（亿元，年初至今）。 */
+/** 营业收入结构（亿元，年初至今）。合计等于 finance.revenue.now；利息净收入年化后 ÷ 净息差 ≈ 生息资产，和存贷款规模相称。 */
 export const revenueMix = [
-  { name: '利息净收入', value: 118.6 },
+  { name: '利息净收入', value: 95.2 },
   { name: '手续费及佣金', value: 46.3 },
   { name: '投资收益', value: 21.9 },
   { name: '汇兑收益', value: 6.4 },
@@ -74,21 +74,31 @@ const CITIES = branches.map((b) => b.name.replace('分行', ''));
 export function nextTransaction(r = Math.random) {
   const type = TX_TYPES[Math.floor(r() * TX_TYPES.length)];
   const city = CITIES[Math.floor(r() * CITIES.length)];
-  const amount = Math.round(10 ** (2 + r() * 4.5)); // 100 元 ~ 3000 万元，对数分布
+  const amount = Math.round(10 ** (2 + r() * 5.4)); // 100 元 ~ 2500 万元，对数分布；约 7% 为 ≥1000 万的大额
   return { type, city, amount, at: new Date() };
+}
+
+/** 今日交易的口径：平均 TPS 和平均单笔金额（元）。今日笔数、交易额、实时 TPS 都由它推出，三者始终对得上。 */
+export const txFlow = { avgTps: 45, avgTicket: 12_000 };
+
+/** 今天 0 点到 now 的累计笔数和交易额（亿元），按平均 TPS 估算。 */
+export function todaySoFar(now = new Date()) {
+  const secs = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const count = Math.round(secs * txFlow.avgTps);
+  return { count, amount: Math.round((count * txFlow.avgTicket) / 1e6) / 100 };
 }
 
 function round(x) {
   return Math.round(x * 10) / 10;
 }
 
-/** 核心指标近 12 个月走势（用于指标卡里的迷你趋势线）。 */
+/** 核心指标近 12 个月走势（用于指标卡里的迷你趋势线）。流量类指标（中收、新增客户）最近 10 个月即 1–10 月，合计等于年初至今。 */
 export const kpiTrend = {
   deposits: monthly.slice(-12).map((m) => m.deposits),
   loans: monthly.slice(-12).map((m) => m.loans),
-  nplRatio: [1.46, 1.45, 1.44, 1.44, 1.42, 1.41, 1.39, 1.38, 1.36, 1.34, 1.33, 1.31],
-  feeIncome: [3.1, 3.4, 3.6, 3.5, 3.9, 4.0, 4.2, 4.1, 4.4, 4.6, 4.7, 4.8],
-  newCustomers: [1210, 1330, 1290, 1420, 1510, 1480, 1600, 1650, 1720, 1690, 1810, 1880],
+  nplRatio: [1.41, 1.40, 1.40, 1.39, 1.38, 1.37, 1.36, 1.35, 1.34, 1.33, 1.32, 1.31],
+  feeIncome: [3.4, 3.8, 4.0, 3.9, 4.3, 4.4, 4.7, 4.5, 4.9, 5.1, 5.2, 5.3],
+  newCustomers: [1375, 1511, 1466, 1614, 1716, 1682, 1818, 1875, 1955, 1921, 2057, 2136],
   activeUsers: [402, 410, 418, 425, 431, 440, 452, 461, 470, 478, 489, 497],
 };
 
@@ -114,11 +124,11 @@ export const cityCoords = {
   苏州: [120.5853, 31.2989], 重庆: [106.5516, 29.563],
 };
 
-/** 经营指标（年初至今，亿元 / %），lastYear 为去年同期。 */
+/** 经营指标（年初至今，亿元 / %），lastYear 为去年同期。营收、净利润的 trend 是月度值，最近 10 个月（1–10 月）合计等于年初至今。 */
 export const finance = {
-  revenue: { now: 196.4, lastYear: 178.2, trend: [14.1, 15.0, 15.8, 15.2, 16.4, 16.9, 17.3, 16.8, 17.9, 18.4, 18.8, 19.6] },
-  netProfit: { now: 68.7, lastYear: 61.9, trend: [4.9, 5.2, 5.6, 5.3, 5.8, 6.0, 6.1, 5.9, 6.4, 6.6, 6.7, 7.0] },
-  roe: { now: 11.86, lastYear: 11.42, trend: [11.2, 11.3, 11.3, 11.4, 11.5, 11.5, 11.6, 11.6, 11.7, 11.7, 11.8, 11.86] },
+  revenue: { now: 173.0, lastYear: 157.3, trend: [14.1, 15.0, 15.8, 15.2, 16.4, 16.9, 17.3, 16.8, 17.9, 18.4, 18.8, 19.5] },
+  netProfit: { now: 68.7, lastYear: 61.9, trend: [5.5, 5.8, 6.3, 5.9, 6.5, 6.7, 6.8, 6.6, 7.2, 7.4, 7.5, 7.8] },
+  roe: { now: 11.86, lastYear: 11.42, trend: [11.46, 11.49, 11.52, 11.55, 11.59, 11.62, 11.66, 11.70, 11.73, 11.77, 11.81, 11.86] },
   nim: { now: 1.92, lastYear: 2.01, trend: [2.01, 2.0, 1.99, 1.98, 1.97, 1.96, 1.96, 1.95, 1.94, 1.93, 1.93, 1.92] },
   costIncome: { now: 28.4, lastYear: 29.6, trend: [29.6, 29.5, 29.3, 29.2, 29.1, 29.0, 28.9, 28.8, 28.7, 28.6, 28.5, 28.4] },
   retailAum: { now: 5268, lastYear: 4710, trend: [4710, 4752, 4801, 4855, 4903, 4950, 5004, 5060, 5112, 5160, 5221, 5268] },
